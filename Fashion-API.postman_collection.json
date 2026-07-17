@@ -1,0 +1,268 @@
+{
+  "info": {
+    "_postman_id": "fashion-api-collection",
+    "name": "Fashion API",
+    "description": "Coleção de endpoints para a Fashion API com testes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Testar API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code é 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contém mensagem de sucesso\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Fashion API\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Roupas",
+      "item": [
+        {
+          "name": "Criar Roupa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Camiseta Básica\",\n  \"categoria\": \"Camiseta\",\n  \"cor\": \"Azul\",\n  \"tamanho\": \"M\",\n  \"preco\": 49.90,\n  \"marca\": \"Nike\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/roupas",
+              "host": ["{{base_url}}"],
+              "path": ["roupas"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code é 201 (Created)\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response é um objeto JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Response contém ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData._id).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"Response contém os dados enviados\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.nome).to.equal(\"Camiseta Básica\");",
+                  "    pm.expect(jsonData.categoria).to.equal(\"Camiseta\");",
+                  "    pm.expect(jsonData.preco).to.equal(49.90);",
+                  "});",
+                  "",
+                  "pm.globals.set(\"roupa_id\", pm.response.json()._id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Todas as Roupas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/roupas",
+              "host": ["{{base_url}}"],
+              "path": ["roupas"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code é 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response é um array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(Array.isArray(jsonData)).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Cada item tem os campos obrigatórios\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        jsonData.forEach(function(item) {",
+                  "            pm.expect(item._id).to.exist;",
+                  "            pm.expect(item.nome).to.exist;",
+                  "            pm.expect(item.categoria).to.exist;",
+                  "            pm.expect(item.cor).to.exist;",
+                  "            pm.expect(item.tamanho).to.exist;",
+                  "            pm.expect(item.preco).to.exist;",
+                  "            pm.expect(item.marca).to.exist;",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter Roupa por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/roupas/{{roupa_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["roupas", "{{roupa_id}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code é 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response é um objeto JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Resposta contém ID correto\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData._id).to.equal(pm.globals.get(\"roupa_id\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar Roupa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preco\": 39.90,\n  \"cor\": \"Vermelho\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/roupas/{{roupa_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["roupas", "{{roupa_id}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code é 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contém dados atualizados\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.preco).to.equal(39.90);",
+                  "    pm.expect(jsonData.cor).to.equal(\"Vermelho\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deletar Roupa",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/roupas/{{roupa_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["roupas", "{{roupa_id}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code é 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Resposta contém mensagem de sucesso\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.mensagem).to.include(\"excluída\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "roupa_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
